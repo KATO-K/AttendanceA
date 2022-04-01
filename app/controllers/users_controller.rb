@@ -63,12 +63,16 @@ class UsersController < ApplicationController
   end
   
   def update_basic_info_all
-    if User.update_all(basic_time:params[:basic_time], work_time:params[:work_time])
+    @users = User.all
+    @users.each do |user|
+    if user.update_attributes(basic_info_params_all)
        flash[:success] = "基本情報を更新しました。"
+       redirect_to users_url and return
     else
       flash[:danger] = "更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
+      redirect_to users_url and return
     end
-    redirect_to users_url
+    end
   end
   
   
