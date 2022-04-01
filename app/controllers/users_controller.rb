@@ -1,8 +1,8 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
-  before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
-  before_action :correct_user, only: [:show, :edit, :update]
-  before_action :admin_user, only: [:index, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
+  before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
+  before_action :correct_user, only: [:edit, :update]
+  before_action :admin_user, only: [:index, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
   before_action :set_one_month, only: :show
 
   def index
@@ -32,6 +32,7 @@ class UsersController < ApplicationController
   end
 
   def update
+    
     if @user.update_attributes(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
       redirect_to @user
@@ -57,6 +58,20 @@ class UsersController < ApplicationController
     end
     redirect_to users_url
   end
+  
+  def edit_basic_info_all
+  end
+  
+  def update_basic_info_all
+    if User.update_all(basic_time:params[:basic_time], work_time:params[:work_time])
+       flash[:success] = "基本情報を更新しました。"
+    else
+      flash[:danger] = "更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
+    end
+    redirect_to users_url
+  end
+  
+  
 
   private
 
@@ -67,4 +82,9 @@ class UsersController < ApplicationController
     def basic_info_params
       params.require(:user).permit(:department, :basic_time, :work_time)
     end
+
+    def basic_info_params_all
+      params.require(:user).permit(:basic_time, :work_time)
+    end
+    
 end
