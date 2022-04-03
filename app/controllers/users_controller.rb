@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
   before_action :correct_user, only: [:edit, :update]
   before_action :admin_user, only: [:index, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
+  before_action :correct_or_admin_user, only: [:show]
   before_action :set_one_month, only: :show
 
   def index
@@ -71,12 +72,12 @@ class UsersController < ApplicationController
     @users.each do |user|
     if user.update_attributes(basic_info_params_all)
        flash[:success] = "基本情報を更新しました。"
-       redirect_to users_url and return
     else
       flash[:danger] = "更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
       redirect_to users_url and return
     end
     end
+    redirect_to users_url and return
   end
   
   
