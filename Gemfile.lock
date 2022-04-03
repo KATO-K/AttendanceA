@@ -79,7 +79,7 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
-    loofah (2.15.0)
+    loofah (2.16.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -127,6 +127,7 @@ GEM
     rb-fsevent (0.11.1)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rounding (1.0.1)
     ruby_dep (1.5.0)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
@@ -189,6 +190,7 @@ DEPENDENCIES
   puma (~> 3.7)
   rails (~> 5.1.6)
   rails-i18n
+  rounding
   sass-rails (~> 5.0)
   spring
   spring-watcher-listen (~> 2.0.0)
