@@ -1,0 +1,67 @@
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+      <h1 class="modal-title">残業申請</h1>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        
+
+<%= form_with(model: @user, url: attendances_update_overtime_user_path(id: @user.id, format: params[:format] ), local: true, method: :patch) do |f| %>
+
+  <div>
+    <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>曜日</th>
+          <th>終了予定時間</th>
+          <th>翌日</th>
+          <th>業務処理内容</th>
+          <th>支持者確認㊞</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      
+        <% @attendances.each do |day| %>
+          <%= f.fields_for day do |attendance| %>
+           <tr>
+            <td><%= day.worked_on %></td>
+            <% if day.worked_on.wday == 6 %>
+              <td class="sat"><%= $days_of_the_week[day.worked_on.wday] %>
+            <% elsif day.worked_on.wday == 0 %>
+              <td class="sun"><%= $days_of_the_week[day.worked_on.wday] %>
+            <% else %>
+              <td><%= $days_of_the_week[day.worked_on.wday] %>
+            <% end %>
+            <td><%= attendance.time_field :scheduled_end_time,  class: "form-control" %></td>
+            <td><%= attendance.check_box :next_day, id: "next_day"  %></td>
+            <td><%= attendance.text_field :business_process, class: "form-control" %></td>
+            <% if params[:id] == "2" %>
+              <th><%= attendance.select :confirmation_one_month,[["なし","なし"],["上長B","上長B"]], class: "form-control" %></th>
+              <% elsif params[:id] == "3" %>
+              <th><%= attendance.select :confirmation_one_month,[["なし","なし"],["上長A","上長A"]], class: "form-control" %></th>
+              <% else %>
+              <th><%= attendance.select :confirmation_one_month,[["なし","なし"],["上長A","上長A"],["上長B","上長B"]], class: "form-control" %></th>
+            <% end %>
+           </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="center">
+    <%= f.submit "申請", class: "btn btn-lg btn-primary" %>
+  </div>
+<% end %>
+
+</div>
+      </div>
+    </div>
+  </div>
+</div>

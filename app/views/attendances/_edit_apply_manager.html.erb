@@ -1,0 +1,62 @@
+<% provide(:title, @user.name) %>
+
+<%= form_with(model: @users, url: attendances_update_apply_manager_user_path(), local: true, method: :patch) do |f| %>
+<% @users.each do |user| %> 
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+      <h1 class="modal-title"><%= user.name %>からの勤怠変更申請</h1>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+    <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+      <thead>
+        <tr>
+          <th>月</th>
+          <th>指示者承認㊞</th>
+          <th>変更</th>
+          <th>勤怠を確認する</th>
+        </tr> 
+      </thead>
+
+      <tbody>
+        <% user.attendances.each do |day| %>
+          <%= f.fields_for "attendances[]", day do |attendance| %>
+            <tr>
+            <% if params[:id] == "2" %>
+              <% if day.confirmation_manager == "上長A" %>
+              <td><%= l(day.worked_on, format: :short) %></td>
+              <td><%= attendance.select :confirmation_manager,[["なし","なし"],["承認","承認"],["否認","否認"]], class: "form-ccntrol" %></td>
+              <td><%= attendance.check_box :change_manager, id: "change_manager"  %></td>
+              <td><%= link_to "確認", user_path(date: day.worked_on, id: user.id), class: "btn btn-lg btn-primary" %></td>
+              <% end %>
+            <% end %>
+            <% if params[:id] == "3" %>
+              <% if day.confirmation_manager == "上長B" %>
+              <td><%= l(day.worked_on, format: :short) %></td>
+              <td><%= attendance.select :confirmation_manager,[["なし","なし"],["承認","承認"],["否認","否認"]], class: "form-ccntrol" %></td>
+              <td><%= attendance.check_box :change_manager, id: "change_manager"  %></td>
+              <td><%= link_to "確認", user_path(date: day.worked_on, id: user.id), class: "btn btn-lg btn-primary" %></td>
+              <% end %>
+            <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody> 
+    </table>
+  <% end %>
+  
+
+  <div class="center">
+    <%= f.submit "まとめて申請", class: "btn btn-lg btn-primary" %>
+  </div>
+<% end %>
+
+</div>
+      </div>
+    </div>
+  </div>
+</div>

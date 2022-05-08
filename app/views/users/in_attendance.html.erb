@@ -1,0 +1,29 @@
+<% provide(:title, 'in attendance') %>
+
+<h1>出社社員一覧</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+  <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+    <thead>
+      <tr>
+        <th>社員番号</th>
+        <th>氏名</th>
+      </tr>
+    </thead>
+      <% @users.each do |user| %>
+        <% user.attendances.each do |attendance| %>
+          <% if (Date.current == attendance.worked_on) && attendance.started_at != nil && attendance.finished_at == nil %>
+        <tr>
+          <td><%= user.id %></td>
+          <td><%= user.name %></td>
+        </tr>
+          <% end %>
+        <% end %>
+      <% end %>
+  </table>
+
+
+  </div>
+</div>

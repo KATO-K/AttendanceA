@@ -1,0 +1,36 @@
+<% provide(:title, "Base") %>
+<% provide(:class_text, 'Base--index') %>
+<% provide(:button_text, '更新') %>
+<h1>拠点一覧</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+  <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th>拠点番号</th>
+        <th>拠点名</th>
+        <th>勤怠種類</th>
+      </tr>
+    </thead>
+      <% @bases.each do |base| %>
+        <tr>
+          <td><%= link_to "修正", edit_basis_path(base), class: "btn btn-lg btn-success" %></td>
+          <td><%= button_to "削除", basis_path(base), method: :delete, class: "btn btn-lg btn-danger" %></td>
+          <td><%= base.number %></td>
+          <td><%= base.name %></td>
+          <td><%= base.kind %></td>
+        </tr>
+        <% end %>
+  </table>
+
+  <%= link_to "新規作成", new_basis_path, class: "btn btn-lg btn-primary" %>
+
+
+  </div>
+</div>
+
+<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>

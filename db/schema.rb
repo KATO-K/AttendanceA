@@ -10,31 +10,58 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220329113941) do
+ActiveRecord::Schema.define(version: 20220508090805) do
 
   create_table "attendances", force: :cascade do |t|
     t.date "worked_on"
     t.datetime "started_at"
     t.datetime "finished_at"
+    t.datetime "before_started_at"
+    t.datetime "before_finished_at"
+    t.datetime "apply_time"
     t.string "note"
-    t.integer "user_id"
+    t.datetime "scheduled_end_time"
+    t.string "next_day"
+    t.string "business_process"
+    t.string "confirmation", default: "なし"
+    t.string "confirmation_one_month", default: "なし"
+    t.string "confirmation_manager", default: "なし"
+    t.string "confirmation_user", default: "なし"
+    t.string "change"
+    t.string "change_manager"
+    t.string "change_one_month"
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 
+  create_table "bases", force: :cascade do |t|
+    t.string "name"
+    t.string "kind"
+    t.integer "number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "apply"
+    t.string "apply_one_month"
+    t.string "apply_manager"
     t.string "password_digest"
     t.string "remember_digest"
     t.boolean "admin", default: false
-    t.string "department"
-    t.datetime "basic_time", default: "2022-03-29 23:00:00"
-    t.datetime "work_time", default: "2022-03-29 22:30:00"
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.boolean "superior", default: false
+    t.string "affiliation"
+    t.integer "employee_number"
+    t.integer "uid"
+    t.datetime "basic_work_time", default: "2022-05-07 23:00:00"
+    t.datetime "designated_work_start_time", default: "2022-05-08 01:00:00"
+    t.datetime "designated_work_end_time", default: "2022-05-08 10:00:00"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

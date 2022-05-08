@@ -39,9 +39,10 @@ ja:
     - 土曜日
     formats:
       default: "%Y/%m/%d"
-      long: "%Y年%m月%d日(%a)"
+      long: "%Y-%m-%d"
       middle: "%Y年%m月"
       short: "%-m/%-d"
+      month: "%-m月"
     month_names:
     - 
     - 1月
@@ -61,6 +62,12 @@ ja:
     - :month
     - :day
   datetime:
+    formats:
+      default: "%Y年%m月%d日(%a) %H時%M分%S秒 %z"
+      long: "%Y/%m/%d %H:%M"
+      short: "%m/%d %H:%M"
+      md: "%m/%d"
+      time: "%H:%M"
     distance_in_words:
       about_x_hours:
         one: 約1時間
@@ -202,10 +209,11 @@ ja:
     am: 午前
     formats:
       default: "%Y年%m月%d日(%a) %H時%M分%S秒 %z"
-      long: "%Y/%m/%d %H:%M"
+      long: "%Y-%m-%d"
       short: "%m/%d %H:%M"
-      time: "%H：%M"
+      md: "%m/%d"
+      
+      time: "%H:%M"
       hour: "%H"
       min: "%M"
-      
     pm: 午後

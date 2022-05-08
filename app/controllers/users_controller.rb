@@ -1,21 +1,50 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
-  before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
-  before_action :correct_user, only: [:edit, :update]
-  before_action :admin_user, only: [:index, :destroy, :edit_basic_info, :update_basic_info, :edit_basic_info_all, :update_basic_info_all]
-  before_action :correct_or_admin_user, only: [:show]
-  before_action :set_one_month, only: :show
+  before_action :set_user, only: [:show, :show_confirmation, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :logged_in_user, only: [:show, :show_confirmation,:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :superior_or_correct_user, only: [:edit, :update]
+  before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]
+  before_action :set_one_month, only: [:show, :show_confirmation]
 
   def index
-    if params[:search].present?
-      @users = User.paginate(page: params[:page]).search(params[:search])
-    else
-      @users = User.paginate(page: params[:page])
-    end
+    @users = User.paginate(page: params[:page])
   end
 
   def show
+    if params[:id] == "1"
+      redirect_back(fallback_location: root_path)
+    end
     @worked_sum = @attendances.where.not(started_at: nil).count
+    @approval = @user.attendances.find_by(worked_on: @first_day)
+
+    @approvals = Attendance.find_by(confirmation: "上長A")
+    @approvals.nil? ? @approvals = @approvals_overtime = Attendance.find_by(confirmation: "なし") : 
+                                   @approvals_overtime = Attendance.find_by(confirmation: "上長A") 
+    @approvals = Attendance.find_by(confirmation_one_month: "上長A")
+    @approvals.nil? ? @approvals = @approvals_one_month = Attendance.find_by(confirmation_one_month: "なし") : 
+                                   @approvals_one_month = Attendance.find_by(confirmation_one_month: "上長A") 
+    @approvals = Attendance.find_by(confirmation_manager: "上長A")
+    @approvals.nil? ? @approvals = @approvals_manager = Attendance.find_by(confirmation_manager: "なし") : 
+                                   @approvals_manager = Attendance.find_by(confirmation_manager: "上長A") 
+
+    @approval_manager_sum = Attendance.where(confirmation_manager: "上長A").count
+    @approval_one_month_sum = Attendance.where(confirmation_one_month: "上長A").count
+    @approval_overtime_sum = Attendance.where(confirmation: "上長A").count
+
+  end
+
+  def show_confirmation
+    @worked_sum = @attendances.where.not(started_at: nil).count
+    @approval = @user.attendances.find_by(worked_on: @first_day)
+
+    @approvals = Attendance.find_by(confirmation: "上長A")
+    @approvals.nil? ? @approvals = @approvals_overtime = Attendance.find_by(confirmation: "なし") : 
+                                   @approvals_overtime = Attendance.find_by(confirmation: "上長A") 
+    @approvals = Attendance.find_by(confirmation_one_month: "上長A")
+    @approvals.nil? ? @approvals = @approvals_one_month = Attendance.find_by(confirmation_one_month: "なし") : 
+                                   @approvals_one_month = Attendance.find_by(confirmation_one_month: "上長A") 
+    @approvals = Attendance.find_by(confirmation_manager: "上長A")
+    @approvals.nil? ? @approvals = @approvals_manager = Attendance.find_by(confirmation_manager: "なし") : 
+                                   @approvals_manager = Attendance.find_by(confirmation_manager: "上長A") 
   end
 
   def new
@@ -37,8 +66,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    
-    if @user.update_attributes(user_params)
+    if @user.update(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
       redirect_to @user
     else
@@ -56,44 +84,43 @@ class UsersController < ApplicationController
   end
 
   def update_basic_info
-    if @user.update_attributes(basic_info_params)
-      flash[:success] = "#{@user.name}の基本情報を更新しました。"
+    @users = User.paginate(page: params[:page], per_page: 20)
+    @user = User.find(params[:id])
+    if @user.update(basic_info_params)
+      flash[:success] = "アカウント情報を更新しました。"
+      redirect_to users_url
     else
-      flash[:danger] = "#{@user.name}の更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
+      render :index
     end
-    redirect_to users_url
+  end
+
+  def in_attendance
+    @users = User.all.includes(:attendances)
+  end
+
+  def import
+    if params[:file].blank?
+      flash[:danger] = "ファイルを選択してください"
+      redirect_to users_url 
+    else 
+      User.import(params[:file])
+      flash[:success] = "アカウント情報を追加しました。"
+      redirect_to users_url
+    end
   end
   
-  def edit_basic_info_all
+  def basic_info
   end
-  
-  def update_basic_info_all
-    @users = User.all
-    @users.each do |user|
-    if user.update_attributes(basic_info_params_all)
-       flash[:success] = "基本情報を更新しました。"
-    else
-      flash[:danger] = "更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
-      redirect_to users_url and return
-    end
-    end
-    redirect_to users_url and return
-  end
-  
-  
 
   private
 
     def user_params
-      params.require(:user).permit(:name, :email, :department, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email,:password, :password_confirmation)
     end
 
     def basic_info_params
-      params.require(:user).permit(:department, :basic_time, :work_time)
+      params.require(:user).permit(:name, :email, :password, :affiliation, :employee_number, :uid, :basic_work_time, :designated_work_start_time, :designated_work_end_time)
     end
 
-    def basic_info_params_all
-      params.require(:user).permit(:basic_time, :work_time)
-    end
-    
+   
 end

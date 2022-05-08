@@ -10,9 +10,9 @@ class User < ApplicationRecord
   validates :email, presence: true, length: { maximum: 100 },
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: true
-  validates :department, length: { in: 2..50 }, allow_blank: true
-  validates :basic_time, presence: true
-  validates :work_time, presence: true
+  validates :basic_work_time, presence: true
+  validates :designated_work_start_time, presence: true
+  validates :designated_work_end_time, presence: true
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
@@ -49,12 +49,47 @@ class User < ApplicationRecord
   def forget
     update_attribute(:remember_digest, nil)
   end
-  
-  def self.search(search)
-    if search
-      where(['name LIKE ?', "%#{search}%"])
-    else
-      all
+
+  #importメソッド
+  def self.import(file)
+    imported_num = 0
+  #   #文字コード変換のためにKernel#openとCSV#newを併用
+  #   #参考： http://qiita.com/labocho/items/8559576b71642b79df67
+    open(file.path, 'r:cp932:utf-8', undef: :replace) do |f|
+      csv = CSV.new(f, :headers => :first_row) #エラーが出る
+      csv.each do |row|
+        next if row.header_row?
+
+  #       #CSVの行情報をHASHに変換
+        table = Hash[[row.headers, row.fields].transpose]
+
+  #       #登録済みデータ情報
+  #       #登録されてなければ作成
+        user = find_by(:id => table['id'])
+        if user.nil?
+          user = new
+        end
+
+  #       #データ情報更新
+        user.attributes = table.to_hash.slice(
+          *table.to_hash.except(:id, :created_at, :updated_at).keys)
+
+  #       #バリデーションokの場合は保存
+        if user.valid?
+          user.save!
+          imported_num += 1
+        end
+      end
     end
+
+  #   #更新件数を返却
+    imported_num
   end
+
+
+  # 更新を許可するカラムを定義
+  def self.updatable_attributes
+    ["title", "user_id"]
+  end
+
 end

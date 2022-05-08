@@ -10,8 +10,18 @@ module AttendancesHelper
     return false
   end
 
+
   # 出勤時間と退勤時間を受け取り、在社時間を計算して返します。
   def working_times(start, finish)
     format("%.2f", (((finish - start) / 60) / 60.0))
   end
+
+  def over_times(schedul, designate)
+    format("%.2f", (((schedul - schedul.midnight.since(designate.seconds_since_midnight)) / 60) / 60.0))
+  end
+  
+  def next_over_times(schedul, designate)
+    format("%.2f", (((schedul - schedul.midnight.since(designate.seconds_since_midnight)) / 60) / 60.0) + 24)
+  end
+
 end

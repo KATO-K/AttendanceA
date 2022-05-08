@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-  protect_from_forgery with: :exception
   include SessionsHelper
 
   $days_of_the_week = %w{日 月 火 水 木 金 土}
@@ -29,13 +28,36 @@ class ApplicationController < ActionController::Base
   def admin_user
     redirect_to root_url unless current_user.admin?
   end
-  
-  def correct_or_admin_user
-    unless current_user.admin? || current_user?(@user)
-    flash[:danger] = "権限がありません。" 
-    redirect_to root_url 
-    end
+
+  def superior_user
+    redirect_to root_url unless current_user.superior?
   end
+
+  # 管理権限者、または現在ログインしているユーザーを許可します。
+  def admin_or_correct_user
+    @user = User.find(params[:user_id]) if @user.blank?
+    unless current_user?(@user) || current_user.admin?
+      flash[:danger] = "編集権限がありません。"
+      redirect_to(root_url)
+    end  
+  end
+
+  def superior_or_correct_user
+    @user = User.find(params[:user_id]) if @user.blank?
+    unless current_user?(@user) || current_user.superior?
+      flash[:danger] = "編集権限がありません。"
+      redirect_to(root_url)
+    end  
+  end
+
+  def without_admin_user
+    @user = User.find(params[:user_id]) if @user.blank?
+    if current_user.admin?
+      flash[:danger] = "編集権限がありません。"
+      redirect_to(root_url)
+    end  
+  end
+
 
   # ページ出力前に1ヶ月分のデータの存在を確認・セットします。
   def set_one_month 
@@ -58,4 +80,6 @@ class ApplicationController < ActionController::Base
     flash[:danger] = "ページ情報の取得に失敗しました、再アクセスしてください。"
     redirect_to root_url
   end
+
+
 end

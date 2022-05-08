@@ -1,0 +1,42 @@
+<% provide(:title, @user.name) %>
+
+  <h1>勤怠ログ</h1>
+    <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+      <thead>
+        <%= form_with url: attendances_log_attendances_user_path, method: :get, local: true do |form| %>
+          <% options = ["2022", "2021", "2020", "2019"] %>
+		      <%= form.select :year, options, :prompt =>"年" %><br>
+		      <% options = ["1", "2", "3", "4", "5", "6", "7","8", "9", "10", "11", "12"] %>
+		      <%= form.select :month, options, :prompt =>"月" %><br>
+		      <%= form.submit "検索", class: "btn btn-primary btn-md" %>
+        <% end %>
+
+        <tr>
+          <th>日付</th>
+          <th>変更前出社時間</th>
+          <th>変更前退社時間</th>
+          <th>変更後出勤時間</th>
+          <th>変更後出勤時間</th>
+          <th>指示者</th>
+          <th>承認日</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @attendances.each do |day| %>
+          <%= fields_for "attendances[]", day do |attendance| %>
+            <tr>
+            <% if day.confirmation_one_month == "承認" && day.change_one_month == "1" %>
+              <td><%= l(day.worked_on, format: :long) %></td>
+              <td><%= l(day.before_started_at, format: :time) %></td>
+              <td><%= l(day.before_finished_at, format: :time) %></td>
+              <td><%= l(day.started_at, format: :time) %></td>
+              <td><%= l(day.finished_at, format: :time) %></td>
+              <td><%= day.confirmation_user %></td>
+              <td><%= l(day.apply_time, format: :long) %></td>
+            <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody> 
+    </table>
